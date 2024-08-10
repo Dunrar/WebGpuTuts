@@ -56,7 +56,7 @@ impl App {
             &wgpu::DeviceDescriptor {
                 label: None,
                 required_features: wgpu::Features::empty(),
-                required_limits: wgpu::Limits::default(),
+                required_limits: wgpu::Limits::downlevel_webgl2_defaults(),
                 memory_hints: Default::default(),
             },
             None,
@@ -66,12 +66,12 @@ impl App {
         let surface_caps = surface.get_capabilities(&adapter);
         let surface_config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            format: wgpu::TextureFormat::Bgra8Unorm,
+            format: surface_caps.formats[0],
             width: size.width,
             height: size.height,
             present_mode: surface_caps.present_modes[0],
             alpha_mode: surface_caps.alpha_modes[0],
-            view_formats: vec![wgpu::TextureFormat::Bgra8UnormSrgb],
+            view_formats: vec![surface_caps.formats[0]],
             desired_maximum_frame_latency: 2,
         };
         
@@ -105,7 +105,7 @@ impl App {
                 entry_point: "fs_main",
                 compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
-                    format: wgpu::TextureFormat::Bgra8UnormSrgb,
+                    format: surface_caps.formats[0],
                     blend: Some(wgpu::BlendState::REPLACE),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
@@ -128,7 +128,7 @@ impl App {
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         let frame = self.gfx_state.surface.get_current_texture().unwrap();
         let view = frame.texture.create_view(&wgpu::TextureViewDescriptor {
-            format: Some(wgpu::TextureFormat::Bgra8UnormSrgb),
+            format: Some(frame.texture.format()),
             .. Default::default()
         });
         let mut encoder = self.gfx_state.device.create_command_encoder(&Default::default());
