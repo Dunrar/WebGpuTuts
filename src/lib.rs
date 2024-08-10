@@ -276,6 +276,12 @@ impl ApplicationHandler<CustomEvent> for AppState {
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub fn run() {
+    #[cfg(target_arch = "wasm32")]
+    {
+        use winit::platform::web::EventLoopExtWebSys;
+
+        console_error_panic_hook::set_once();
+    }
 
     let event_loop = winit::event_loop::EventLoop::with_user_event().build().unwrap();
     let mut app = AppState::Uninitialized(event_loop.create_proxy());
@@ -288,8 +294,6 @@ pub fn run() {
     #[cfg(target_arch = "wasm32")]
     {
         use winit::platform::web::EventLoopExtWebSys;
-
-        console_error_panic_hook::set_once();
         
         event_loop.spawn_app(app);
     }
