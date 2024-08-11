@@ -76,8 +76,7 @@ impl App {
             desired_maximum_frame_latency: 2,
         };
         
-        #[cfg(not(target_arch = "wasm32"))]
-        {
+        if size.width != 0 && size.height != 0 {
             surface.configure(&device, &surface_config);
         }
 
@@ -235,6 +234,10 @@ impl ApplicationHandler<CustomEvent> for AppState {
         match event {
             winit::event::WindowEvent::Resized(size) => app.resize(size),
             winit::event::WindowEvent::RedrawRequested => {
+                if app.gfx_state.surface_config.width == 0 || app.gfx_state.surface_config.height == 0 {
+                    return
+                }
+
                 #[cfg(target_arch = "wasm32")]
                 {
                     use web_sys::console;
@@ -267,7 +270,10 @@ impl ApplicationHandler<CustomEvent> for AppState {
         match _user_event {
             CustomEvent::Initialized(app) => {
                 take_mut::take(self, |state| match state {
-                    AppState::Uninitialized(_) => AppState::Initialized(app),
+                    AppState::Uninitialized(_) => {
+                        app.gfx_state.window.request_redraw();
+                        AppState::Initialized(app)
+                    },
                     AppState::Initialized(_) => state,
                 });
             }
