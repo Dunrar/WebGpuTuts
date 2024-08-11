@@ -278,8 +278,6 @@ impl ApplicationHandler<CustomEvent> for AppState {
 pub fn run() {
     #[cfg(target_arch = "wasm32")]
     {
-        use winit::platform::web::EventLoopExtWebSys;
-
         console_error_panic_hook::set_once();
     }
 
