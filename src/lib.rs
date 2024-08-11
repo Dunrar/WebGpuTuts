@@ -56,8 +56,8 @@ impl App {
             &wgpu::DeviceDescriptor {
                 label: None,
                 required_features: wgpu::Features::empty(),
-                //required_limits: wgpu::Limits::default(),
-                required_limits: wgpu::Limits::downlevel_webgl2_defaults(),
+                required_limits: wgpu::Limits::default(),
+                // required_limits: wgpu::Limits::downlevel_webgl2_defaults(),
                 memory_hints: Default::default(),
             },
             None,
@@ -76,6 +76,7 @@ impl App {
             desired_maximum_frame_latency: 2,
         };
         
+        // TODO: Checking for zero size will no longer be required once https://github.com/rust-windowing/winit/issues/2863 is resolved
         if size.width != 0 && size.height != 0 {
             surface.configure(&device, &surface_config);
         }
@@ -181,6 +182,7 @@ enum CustomEvent {
 }
 
 enum AppState {
+    // TODO: EventLoopProxy will no longer be required here once https://github.com/rust-windowing/winit/issues/3741 lands
     Uninitialized(EventLoopProxy<CustomEvent>),
     Initialized(App),
 }
@@ -234,10 +236,11 @@ impl ApplicationHandler<CustomEvent> for AppState {
         match event {
             winit::event::WindowEvent::Resized(size) => app.resize(size),
             winit::event::WindowEvent::RedrawRequested => {
+                // TODO: Checking for zero size will no longer be required once https://github.com/rust-windowing/winit/issues/2863 is resolved
                 if app.gfx_state.surface_config.width == 0 || app.gfx_state.surface_config.height == 0 {
                     return
                 }
-                
+
                 #[cfg(target_arch = "wasm32")]
                 {
                     use web_sys::console;
