@@ -240,13 +240,7 @@ impl ApplicationHandler<CustomEvent> for AppState {
                 if app.gfx_state.surface_config.width == 0 || app.gfx_state.surface_config.height == 0 {
                     return
                 }
-
-                #[cfg(target_arch = "wasm32")]
-                {
-                    use web_sys::console;
-        
-                    console::log_1(&"Redraw requested.".into());
-                }
+                
                 match app.render() {
                     Ok(_) => {}
                     Err(e) => {
